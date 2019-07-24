@@ -101,12 +101,21 @@ contract FlightSuretyApp {
     *
     */   
     function registerAirline
-                            (   
+                            (  
+                                address airline 
                             )
                             external
                             pure
                             returns(bool success, uint256 votes)
     {
+        // 生产key
+        bytes32 key = keccak256(abi.encodePacked(airline));
+        flights[key] = Flight({
+            isRegistered: true,
+            statusCode: STATUS_CODE_UNKNOWN,
+            updatedTimestamp: block.timestamp,
+            airline: airline
+        });
         return (success, 0);
     }
 
