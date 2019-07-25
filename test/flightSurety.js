@@ -104,5 +104,32 @@ contract('Flight Surety Tests', async (accounts) => {
     assert.equal(count, 4, "The fifth airline can not register")
   });
  
+    //添加consensus mechanism
+    it('(airline) consensus mechanism', async () => {
+        let i = 0;
+        let votes = 0;
+        let airlineCounts = await config.flightSuretyApp.getAirlineCounts();
+        let count = airlineCounts.toNumber()
+        console.log(count)
+        await config.flightSuretyApp.registerAirline(accounts[5], 'A1', {from: accounts[1]}).then(function(res){
+            console.log(res)
+            votes=res[1]
+            console.log(votes)
+        })
+        airlineCounts = await config.flightSuretyApp.getAirlineCounts();
+        count = airlineCounts.toNumber()
+        console.log(count)
+        
+        await config.flightSuretyApp.registerAirline(accounts[5], 'A1', {from: accounts[2]})
+        airlineCounts = await config.flightSuretyApp.getAirlineCounts();
+        count = airlineCounts.toNumber()
+        console.log(count)
+
+        await config.flightSuretyApp.registerAirline(accounts[5], 'A1', {from: accounts[3]})
+
+        airlineCounts = await config.flightSuretyApp.getAirlineCounts();
+        count = airlineCounts.toNumber()
+        console.log(count)
+    });
 
 });

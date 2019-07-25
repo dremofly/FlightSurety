@@ -112,6 +112,7 @@ contract FlightSuretyApp {
                             returns(bool success, uint256 votes)
     {
         bool allowRegister = false;
+        bool registered = false;    //  保证只能注册一次
         if(airlineCount < 4) {
             // 前四个的情况
             allowRegister = true;
@@ -122,15 +123,16 @@ contract FlightSuretyApp {
             } else {
                 airlineVotes[candiKey] = airlineVotes[candiKey] + 1;
             }
-            if(airlineVotes[candiKey]*2 >= airlineCount) {
+            if(airlineVotes[candiKey]*2 > airlineCount) {
                 allowRegister = true;
+                registered = true;
             } else {
                 return (false, airlineVotes[candiKey]);
             }
             
         }
 
-        if(allowRegister) {
+        if(allowRegister && !registered) {
             bytes32 key = keccak256(abi.encodePacked(airline, flight, block.timestamp));
                     flights[key] = Flight({
                     isRegistered: true,
@@ -153,6 +155,14 @@ contract FlightSuretyApp {
         return airlineCount;
     }
 
+    /**
+    * @dev Return the votes of a airline
+    *
+    */
+    function getVotes(address airline, string flight) external view returns(uint256){
+        bytes32 candiKey = keccak256(abi.encodePacked(airline, flight));
+        return airlineVotes[candiKey]; 
+    }
 
    /**
     * @dev Register a future flight for insuring.
