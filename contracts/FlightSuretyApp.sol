@@ -26,6 +26,8 @@ contract FlightSuretyApp {
 
     address private contractOwner;          // Account used to deploy contract
 
+    uint256 private airlineCount = 0;
+
     struct Flight {
         bool isRegistered;
         uint8 statusCode;
@@ -34,7 +36,8 @@ contract FlightSuretyApp {
     }
     mapping(bytes32 => Flight) private flights;
 
- 
+    mapping(bytes32 => uint256) private airlineVotes;    // the votes a flight gets. 
+                                                // If it is larger than half of airlineCount, the corrensponding flight will be registered
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
     /********************************************************************************************/
@@ -102,21 +105,52 @@ contract FlightSuretyApp {
     */   
     function registerAirline
                             (  
-                                address airline 
+                                address airline,
+                                string flight 
                             )
                             external
-                            pure
                             returns(bool success, uint256 votes)
     {
-        // 生产key
-        bytes32 key = keccak256(abi.encodePacked(airline));
-        flights[key] = Flight({
-            isRegistered: true,
-            statusCode: STATUS_CODE_UNKNOWN,
-            updatedTimestamp: block.timestamp,
-            airline: airline
-        });
-        return (success, 0);
+        bool allowRegister = false;
+        if(airlineCount < 4) {
+            // 前四个的情况
+            allowRegister = true;
+        } else {
+            bytes32 candiKey = keccak256(abi.encodePacked(airline, flight));
+            if(airlineVotes[candiKey] == 0) {
+                airlineVotes[candiKey] = 1;
+            } else {
+                airlineVotes[candiKey] = airlineVotes[candiKey] + 1;
+            }
+            if(airlineVotes[candiKey]*2 >= airlineCount) {
+                allowRegister = true;
+            } else {
+                return (false, airlineVotes[candiKey]);
+            }
+            
+        }
+
+        if(allowRegister) {
+            bytes32 key = keccak256(abi.encodePacked(airline, flight, block.timestamp));
+                    flights[key] = Flight({
+                    isRegistered: true,
+                    statusCode: STATUS_CODE_UNKNOWN,
+                    updatedTimestamp: block.timestamp,
+                    airline: airline
+                });
+            airlineCount = airlineCount + 1;
+            return (true, airlineVotes[candiKey]);
+        }
+        
+        return (false, airlineVotes[candiKey]);
+    }
+
+   /**
+    * @dev Return the value of registered flights
+    *
+    */   
+    function getAirlineCounts() public view returns(uint256){
+        return airlineCount;
     }
 
 
@@ -130,7 +164,7 @@ contract FlightSuretyApp {
                                 external
                                 pure
     {
-
+        // %TODO:
     }
     
    /**
@@ -145,8 +179,10 @@ contract FlightSuretyApp {
                                     uint8 statusCode
                                 )
                                 internal
-                                pure
     {
+        //%TODO 这个flight是什么用的
+        bytes32 key = keccak256(abi.encodePacked(airline, flight, timestamp));
+        flights[key].statusCode = statusCode;
     }
 
 
@@ -154,7 +190,7 @@ contract FlightSuretyApp {
     function fetchFlightStatus
                         (
                             address airline,
-                            string calldata flight,
+                            string flight,
                             uint256 timestamp                            
                         )
                         external
@@ -257,7 +293,7 @@ contract FlightSuretyApp {
                         (
                             uint8 index,
                             address airline,
-                            string calldata flight,
+                            string flight,
                             uint256 timestamp,
                             uint8 statusCode
                         )

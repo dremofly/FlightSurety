@@ -5,10 +5,13 @@ var BigNumber = require('bignumber.js');
 contract('Flight Surety Tests', async (accounts) => {
 
   var config;
+  
+  
   before('setup contract', async () => {
     config = await Test.Config(accounts);
-    await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);
+    //await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);
   });
+  
 
   /****************************************************************************************/
   /* Operations and Settings                                                              */
@@ -18,6 +21,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
     // Get operating status
     let status = await config.flightSuretyData.isOperational.call();
+    
     assert.equal(status, true, "Incorrect initial operating status value");
 
   });
@@ -33,7 +37,7 @@ contract('Flight Surety Tests', async (accounts) => {
       catch(e) {
           accessDenied = true;
       }
-      assert.equal(accessDenied, true, "Access not restricted to Contract Owner");
+      assert.equal(accessDenied, true, "Access restricted to Contract Owner");
             
   });
 
@@ -73,21 +77,31 @@ contract('Flight Surety Tests', async (accounts) => {
 
   it('(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
     
+
     // ARRANGE
-    let newAirline = accounts[2];
-
-    // ACT
-    try {
-        await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
+    //let newAirline = accounts[2];
+    let i = 0;
+    while(i<5) {
+        // ACT
+        await config.flightSuretyApp.registerAirline(accounts[i+1], 'A1', {from: accounts[0]});
+ //       try {
+ //           await config.flightSuretyApp.registerAirline(account[i+1], 'A1', {from: accounts[0]});
+ //       }
+ //       catch(e) {
+ //           console.log("fail")
+ //       }
+        i++;
     }
-    catch(e) {
+    
+    let airlineCounts = await config.flightSuretyApp.getAirlineCounts();
+    let count = airlineCounts.toNumber()
+    console.log(count)
+    //let result = await config.flightSuretyData.isAirline.call(newAirline); 
 
-    }
-    let result = await config.flightSuretyData.isAirline.call(newAirline); 
 
     // ASSERT
-    assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
-
+    //assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
+    assert.equal(count, 4, "The fifth airline can not register")
   });
  
 
