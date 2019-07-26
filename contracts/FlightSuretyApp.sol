@@ -115,58 +115,17 @@ contract FlightSuretyApp {
                             external
                             returns(bool success, uint256 votes)
     {
-        bool allowRegister = false;
-        bytes32 candiKey = keccak256(abi.encodePacked(airline, flight));
-        if(airlineCount < 4) {
-            // 前四个的情况
-            allowRegister = true;
-        } else {
-            
-            if(airlineVotes[candiKey].votes == 0) {
-                airlineVotes[candiKey].votes = 1;
-            } else {
-                airlineVotes[candiKey].votes = airlineVotes[candiKey].votes + 1;
-            }
-            if(airlineVotes[candiKey].votes*2 > airlineCount) {
-                allowRegister = true;
-                
-            } else {
-                return (false, airlineVotes[candiKey].votes);
-            }
-            
-        }
+       // ****** define the variables ********* 
 
-        if(allowRegister && !airlineVotes[candiKey].isRegistered) {
-            bytes32 key = keccak256(abi.encodePacked(airline, flight, block.timestamp));
-                    flights[key] = Flight({
-                    isRegistered: true,
-                    statusCode: STATUS_CODE_UNKNOWN,
-                    updatedTimestamp: block.timestamp,
-                    airline: airline
-                });
-            airlineCount = airlineCount + 1;
-            airlineVotes[candiKey].isRegistered = true;
-            return (true, airlineVotes[candiKey].votes);
-        }
-        
-        return (false, airlineVotes[candiKey].votes);
-    }
+       // ****** 从datacontract中获取msg.sender的数据和airline的数据 *********  
 
-   /**
-    * @dev Return the value of registered flights
-    *
-    */   
-    function getAirlineCounts() public view returns(uint256){
-        return airlineCount;
-    }
+       // ****** 判断是否funded，还有是否注册 ********* 
 
-    /**
-    * @dev Return the votes of a airline
-    *
-    */
-    function getVotes(address airline, string flight) external view returns(uint256){
-        bytes32 candiKey = keccak256(abi.encodePacked(airline, flight));
-        return airlineVotes[candiKey].votes; 
+       // ****** 获取目前的注册 ********* 
+
+       // ****** 如果小于4个可以直接注册 ********* 
+
+       // ****** 如果大于4个，需要使用consensus mechanism ********* 
     }
 
    /**

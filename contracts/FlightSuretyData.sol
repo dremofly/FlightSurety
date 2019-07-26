@@ -9,6 +9,14 @@ contract FlightSuretyData {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
+    // Flight status codees
+    uint8 private constant STATUS_CODE_UNKNOWN = 0;
+    uint8 private constant STATUS_CODE_ON_TIME = 10;
+    uint8 private constant STATUS_CODE_LATE_AIRLINE = 20;
+    uint8 private constant STATUS_CODE_LATE_WEATHER = 30;
+    uint8 private constant STATUS_CODE_LATE_TECHNICAL = 40;
+    uint8 private constant STATUS_CODE_LATE_OTHER = 50;
+
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;                                    // Blocks all state changes throughout the contract if false
 
@@ -56,6 +64,10 @@ contract FlightSuretyData {
         _;
     }
 
+    //TODO: 检查address是否有效
+
+    //TODO: 使得只有apcontract可以调用这个datacontract
+
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
     /********************************************************************************************/
@@ -90,6 +102,24 @@ contract FlightSuretyData {
         operational = mode;
     }
 
+    // 根据modifier，这里需要设置。TODO: 使得appcontract可以调用datacontract
+    // function authorizeAppContract(address contractAddress)
+
+    // TODO: 判断airline是否已经注册了
+    // function isAirline(address airline)
+
+    // TODO: 获取目前有多少的airline注册了
+    // function getRegisteredAirlineCount()
+
+    // TODO: 获取airline的信息
+    // function getAirlineInfo(address ariline)
+
+    // TODO: 获取允许某个airline注册的其他airline的列表。可以用来判断msg.sender是否已经同意了
+    // function getAirlineApprovalList(address airline)
+
+    // TODO: 获取某个passenger保险的数额
+    // function getPassengerInsuredAmount(address airline, string flight, uint256 timestamp, address passenger)
+
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
@@ -108,6 +138,15 @@ contract FlightSuretyData {
 
     }
 
+
+    // TODO: airline的approval列表里面添加新的airline
+    // function addToAirlineApprovalList(address airline, address approver)
+
+    // TODO: 注册flight
+    // function registerFlight (string flight, address airline, uint256 timestamp)
+
+    // TODO: 处理flight状态
+    // function processFlightStatus(bytes32 flightKey, uint8 statusCode)
 
    /**
     * @dev Buy insurance for a flight
