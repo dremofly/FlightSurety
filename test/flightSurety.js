@@ -112,9 +112,7 @@ contract('Flight Surety Tests', async (accounts) => {
         let count = airlineCounts.toNumber()
         console.log(count)
         await config.flightSuretyApp.registerAirline(accounts[5], 'A1', {from: accounts[1]}).then(function(res){
-            console.log(res)
             votes=res[1]
-            console.log(votes)
         })
         airlineCounts = await config.flightSuretyApp.getAirlineCounts();
         count = airlineCounts.toNumber()

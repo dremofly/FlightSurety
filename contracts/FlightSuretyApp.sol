@@ -36,7 +36,11 @@ contract FlightSuretyApp {
     }
     mapping(bytes32 => Flight) private flights;
 
-    mapping(bytes32 => uint256) private airlineVotes;    // the votes a flight gets. 
+    struct Vote {
+        bool isRegistered;
+        uint256 votes;
+    }
+    mapping(bytes32 => Vote) private airlineVotes;    // the votes a flight gets. 
                                                 // If it is larger than half of airlineCount, the corrensponding flight will be registered
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
@@ -112,27 +116,27 @@ contract FlightSuretyApp {
                             returns(bool success, uint256 votes)
     {
         bool allowRegister = false;
-        bool registered = false;    //  保证只能注册一次
+        bytes32 candiKey = keccak256(abi.encodePacked(airline, flight));
         if(airlineCount < 4) {
             // 前四个的情况
             allowRegister = true;
         } else {
-            bytes32 candiKey = keccak256(abi.encodePacked(airline, flight));
-            if(airlineVotes[candiKey] == 0) {
-                airlineVotes[candiKey] = 1;
+            
+            if(airlineVotes[candiKey].votes == 0) {
+                airlineVotes[candiKey].votes = 1;
             } else {
-                airlineVotes[candiKey] = airlineVotes[candiKey] + 1;
+                airlineVotes[candiKey].votes = airlineVotes[candiKey].votes + 1;
             }
-            if(airlineVotes[candiKey]*2 > airlineCount) {
+            if(airlineVotes[candiKey].votes*2 > airlineCount) {
                 allowRegister = true;
-                registered = true;
+                
             } else {
-                return (false, airlineVotes[candiKey]);
+                return (false, airlineVotes[candiKey].votes);
             }
             
         }
 
-        if(allowRegister && !registered) {
+        if(allowRegister && !airlineVotes[candiKey].isRegistered) {
             bytes32 key = keccak256(abi.encodePacked(airline, flight, block.timestamp));
                     flights[key] = Flight({
                     isRegistered: true,
@@ -141,10 +145,11 @@ contract FlightSuretyApp {
                     airline: airline
                 });
             airlineCount = airlineCount + 1;
-            return (true, airlineVotes[candiKey]);
+            airlineVotes[candiKey].isRegistered = true;
+            return (true, airlineVotes[candiKey].votes);
         }
         
-        return (false, airlineVotes[candiKey]);
+        return (false, airlineVotes[candiKey].votes);
     }
 
    /**
@@ -161,7 +166,7 @@ contract FlightSuretyApp {
     */
     function getVotes(address airline, string flight) external view returns(uint256){
         bytes32 candiKey = keccak256(abi.encodePacked(airline, flight));
-        return airlineVotes[candiKey]; 
+        return airlineVotes[candiKey].votes; 
     }
 
    /**
