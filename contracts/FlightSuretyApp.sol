@@ -26,22 +26,7 @@ contract FlightSuretyApp {
 
     address private contractOwner;          // Account used to deploy contract
 
-    uint256 private airlineCount = 0;
-
-    struct Flight {
-        bool isRegistered;
-        uint8 statusCode;
-        uint256 updatedTimestamp;        
-        address airline;
-    }
-    mapping(bytes32 => Flight) private flights;
-
-    struct Vote {
-        bool isRegistered;
-        uint256 votes;
-    }
-    mapping(bytes32 => Vote) private airlineVotes;    // the votes a flight gets. 
-                                                // If it is larger than half of airlineCount, the corrensponding flight will be registered
+    FlightSuretyData dataContract;
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
     /********************************************************************************************/
@@ -80,10 +65,12 @@ contract FlightSuretyApp {
     */
     constructor
                                 (
+                                    address dataContractAddress
                                 ) 
                                 public 
     {
         contractOwner = msg.sender;
+        dataContract = FlightSuretyData(dataContractAddress);
     }
 
     /********************************************************************************************/
@@ -110,22 +97,53 @@ contract FlightSuretyApp {
     function registerAirline
                             (  
                                 address airline,
-                                string flight 
+                                string name 
                             )
                             external
                             returns(bool success, uint256 votes)
     {
        // ****** define the variables ********* 
-
+        bool senderIsRegistered;
+        bool senderIsFunded;
+        bool newIsRegistered;
+        bool newIsFunded;
+        uint256 numberOfApproved;
        // ****** 从datacontract中获取msg.sender的数据和airline的数据 *********  
+        (senderIsRegistered, senderIsRegistered, numberOfApproved) = dataContract.getAirlineInfo(msg.sender);
+        (newIsRegistered, newIsFunded, numberOfApproved) = dataContract.getAirlineInfo(airline);
 
        // ****** 判断是否funded，还有是否注册 ********* 
-
+        require(senderIsFunded, "The sender is not actived");
+        require(!newIsRegistered, "The new airline has been registered!");
        // ****** 获取目前的注册 ********* 
-
+        uint256 registeredAirlineCount = dataContract.getRegisteredAirlinesCount();
        // ****** 如果小于4个可以直接注册 ********* 
-
+        if(registeredAirlineCount < 4) {
+            dataContract.registerAirline(airline, name);
+            success = true;
+            votes = 0;
+        } 
        // ****** 如果大于4个，需要使用consensus mechanism ********* 
+       else {
+            address[] memory approvedBy = dataContract.getAirlineApprovalList(airline);
+            bool isVoted = false;
+            for(uint i=0; i<approvedBy.length; i++) {
+                if(approvedBy[i] == msg.sender) {
+                    isVoted = true;
+                    break;
+                }
+            }
+
+            require(!isVoted, "The sender has voted!");
+
+            dataContract.addToAirlineApprovalList(airline, msg.sender);
+            if(approvedBy.length+1 >= registeredAirlineCount/2) {
+                dataContract.registerAirline(airline, name);
+                success = true;
+            }
+            votes = approvedBy.length + 1;
+       }
+       return (success, votes);
     }
 
    /**
@@ -134,30 +152,34 @@ contract FlightSuretyApp {
     */  
     function registerFlight
                                 (
+                                    string flight,
+                                    uint256 timestamp
                                 )
                                 external
-                                pure
     {
         // %TODO:
+        bytes32 flightKey = getFlightKey(msg.sender, flight, timestamp);
+        dataContract.registerFlight(flight, msg.sender, timestamp);
+        emit FlightRegistered(flightKey);
     }
     
    /**
-    * @dev Called after oracle has updated flight status
-    *
-    */  
-    function processFlightStatus
-                                (
-                                    address airline,
-                                    string memory flight,
-                                    uint256 timestamp,
-                                    uint8 statusCode
-                                )
-                                internal
-    {
-        //%TODO 这个flight是什么用的
-        bytes32 key = keccak256(abi.encodePacked(airline, flight, timestamp));
-        flights[key].statusCode = statusCode;
-    }
+ //   * @dev Called after oracle has updated flight status
+ //   *
+ //   */  
+ //   function processFlightStatus
+ //                               (
+ //                                   address airline,
+   //                                 string memory flight,
+     //                               uint256 timestamp,
+       //                             uint8 statusCode
+         //                       )
+           //                     internal
+ //   {
+ //       //%TODO 这个flight是什么用的
+ //       bytes32 key = keccak256(abi.encodePacked(airline, flight, timestamp));
+ //       flights[key].statusCode = statusCode;
+ //   }
 
 
     // Generate a request for oracles to fetch flight information
@@ -217,6 +239,8 @@ contract FlightSuretyApp {
 
     // Event fired each time an oracle submits a response
     event FlightStatusInfo(address airline, string flight, uint256 timestamp, uint8 status);
+
+    event FlightRegistered(bytes32 flightKey);
 
     event OracleReport(address airline, string flight, uint256 timestamp, uint8 status);
 
@@ -289,7 +313,7 @@ contract FlightSuretyApp {
             emit FlightStatusInfo(airline, flight, timestamp, statusCode);
 
             // Handle flight status as appropriate
-            processFlightStatus(airline, flight, timestamp, statusCode);
+            dataContract.processFlightStatus(key, statusCode);
         }
     }
 
@@ -354,3 +378,71 @@ contract FlightSuretyApp {
 // endregion
 
 }   
+
+
+contract FlightSuretyData {
+    function setOperatingStatus
+                            (
+                                bool mode
+                            ) 
+                            external;
+    function registerAirline
+                            (   
+                                address airline,
+                                string name
+                            )
+                            external;
+
+    function buy
+                            (
+                                bytes32 flightKey, 
+                                address passenger
+                            )
+                            external
+                            payable;
+    function pay
+                            (
+                                address account
+                            )
+                            external;
+    function fund
+                            (   
+                                address airline
+                            )
+                            public;
+    function isOperational() 
+                            public 
+                            view 
+                            returns(bool); 
+
+    function getAirlineInfo(address airline)
+    external
+    returns (bool isRegistered, bool isFunded, uint256 approvedByLength);
+
+    function getRegisteredAirlinesCount()
+    external
+    returns (uint256);
+
+    function getAirlineApprovalList(address airline)
+    external
+    returns (address[]);
+
+    function addToAirlineApprovalList(address airline, address approver)
+    external;
+
+    function registerFlight
+                                (
+                                    string flight,
+                                    address airline,
+                                    uint256 timestamp
+                                )
+                                external;
+
+    function processFlightStatus
+                                (
+                                    bytes32 flightKey,
+                                    uint8 statusCode
+                                )
+                                external;
+
+}
