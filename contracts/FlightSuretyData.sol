@@ -180,7 +180,7 @@ contract FlightSuretyData {
     }
 
     // TODO: 获取某个passenger保险的数额
-    function getPassengerInsuredAmount(address airline, string flight, uint256 timstamp, address passenger) external view returns(uint256)
+    function getPassengerInsuredAmount(address airline, string flight, uint256 timestamp, address passenger) external view returns(uint256)
     {
         bytes32 key = getFlightKey(airline, flight, timestamp);
         return flights[key].passengersPaymentAmount[passenger];
