@@ -38,6 +38,7 @@ contract FlightSuretyData {
 
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;                                    // Blocks all state changes throughout the contract if false
+    uint256 public registeredAirlinesCount = 1; // TODO: 这里可以用private吗
 
     mapping(address => uint256) public passengersBalances;
     mapping(address => bool) public authorizedContracts;
@@ -48,7 +49,7 @@ contract FlightSuretyData {
     event FlightStatusUpdated(bytes32 flightKey, uint8 status, uint256 passengersCount);
     event AmountRefundedToPassengerBalance(address passenger, uint256 refundAmount);
     
-    uint256 public registeredAirlineCount = 1; // TODO: 这里可以用private吗
+    
     /**
     * @dev Constructor
     *      The deploying account becomes contractOwner
@@ -67,7 +68,7 @@ contract FlightSuretyData {
             name: 'First Airline',
             approvedBy: new address[](0)
         });
-        registeredAirlineCount = 1;
+        registeredAirlinesCount = 1;
     }
 
     /********************************************************************************************/
@@ -107,7 +108,7 @@ contract FlightSuretyData {
 
     //TODO: 使得只有apcontract可以调用这个datacontract
     modifier requireAuthorizedCaller() {
-        require(authorizedContracts[msg.sender] != true, "The app contract is not authorized!");
+        require(authorizedContracts[msg.sender] == true, "The app contract is not authorized!");
         _;
     }
 
@@ -154,19 +155,19 @@ contract FlightSuretyData {
     }
 
     // 判断airline是否已经注册了
-    function isAirline(address airline) external view returns(bool)
+    function isAirline(address airline) external returns(bool)
     {
         return airlines[airline].isRegistered;
     } 
 
     // TODO: 获取目前有多少的airline注册了
-    function getRegisteredAirlineCount() external view returns(uint256 count)
+    function getRegisteredAirlinesCount() external returns(uint256)
     {
-        count = registeredAirlineCount;
+        return registeredAirlinesCount;
     }
 
     // TODO: 获取airline的信息
-    function getAirlineInfo(address airline) external view returns(bool isRegistered, bool isFunded, uint256 numOfApproved)
+    function getAirlineInfo(address airline) external returns(bool isRegistered, bool isFunded, uint256 numOfApproved)
     {
         isRegistered = airlines[airline].isRegistered;
         isFunded = airlines[airline].isFunded;
@@ -174,13 +175,13 @@ contract FlightSuretyData {
     }
 
     // TODO: 获取允许某个airline注册的其他airline的列表。可以用来判断msg.sender是否已经同意了
-    function getAirlineApprovalList(address airline) external view returns(address[]) 
+    function getAirlineApprovalList(address airline) external returns(address[]) 
     {
         return airlines[airline].approvedBy;
     }
 
     // TODO: 获取某个passenger保险的数额
-    function getPassengerInsuredAmount(address airline, string flight, uint256 timestamp, address passenger) external view returns(uint256)
+    function getPassengerInsuredAmount(address airline, string flight, uint256 timestamp, address passenger) external returns(uint256)
     {
         bytes32 key = getFlightKey(airline, flight, timestamp);
         return flights[key].passengersPaymentAmount[passenger];
@@ -206,7 +207,7 @@ contract FlightSuretyData {
     {
         airlines[airline].isRegistered = true;
         airlines[airline].name = name;
-        registeredAirlineCount = registeredAirlineCount + 1;
+        registeredAirlinesCount = registeredAirlinesCount + 1;
     }
 
 

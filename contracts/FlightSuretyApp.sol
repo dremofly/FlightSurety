@@ -42,7 +42,7 @@ contract FlightSuretyApp {
     modifier requireIsOperational() 
     {
          // Modify to call data contract's status
-        require(true, "Contract is currently not operational");  
+        require(isOperational(), "Contract is currently not operational");  
         _;  // All modifiers require an "_" which indicates where the function body will be added
     }
 
@@ -79,10 +79,10 @@ contract FlightSuretyApp {
 
     function isOperational() 
                             public 
-                            pure 
                             returns(bool) 
     {
-        return true;  // Modify to call data contract's status
+        // TODO: 
+        return dataContract.isOperational();  // Modify to call data contract's status
     }
 
     /********************************************************************************************/
@@ -109,16 +109,18 @@ contract FlightSuretyApp {
         bool newIsFunded;
         uint256 numberOfApproved;
        // ****** 从datacontract中获取msg.sender的数据和airline的数据 *********  
-        (senderIsRegistered, senderIsRegistered, numberOfApproved) = dataContract.getAirlineInfo(msg.sender);
+        (senderIsRegistered, senderIsFunded, numberOfApproved) = dataContract.getAirlineInfo(msg.sender);
         (newIsRegistered, newIsFunded, numberOfApproved) = dataContract.getAirlineInfo(airline);
-
+        success = true;
+        votes = 0;
        // ****** 判断是否funded，还有是否注册 ********* 
         require(senderIsFunded, "The sender is not actived");
         require(!newIsRegistered, "The new airline has been registered!");
        // ****** 获取目前的注册 ********* 
         uint256 registeredAirlineCount = dataContract.getRegisteredAirlinesCount();
        // ****** 如果小于4个可以直接注册 ********* 
-        if(registeredAirlineCount < 4) {
+        if(registeredAirlineCount < 4)
+        {
             dataContract.registerAirline(airline, name);
             success = true;
             votes = 0;
@@ -202,6 +204,26 @@ contract FlightSuretyApp {
 
         emit OracleRequest(index, airline, flight, timestamp);
     } 
+
+    function fund () public payable 
+    {
+        bool airlineRegistered;
+        bool airlineFunded;
+        uint256 approvedByLength;
+       (airlineRegistered, airlineFunded, approvedByLength) = dataContract.getAirlineInfo(msg.sender);
+       require(airlineRegistered, "Airline hasn't be registered.");
+       require(!airlineFunded, "Airline has be funded");
+       require(msg.value >= 1 ether, "The value is not enough. At least 1 ether");
+       dataContract.fund(msg.sender);
+    }
+
+    function buy(address airline, string flight, uint256 timestamp) external payable 
+    {
+        // TODO: 值
+        require(msg.value<=1 ether, "Passenger can't insure for more than 1 ether");
+        bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+        dataContract.buy(flightKey, msg.sender);
+    }
 
 
 // region ORACLE MANAGEMENT
