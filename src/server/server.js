@@ -14,7 +14,9 @@ flightSuretyApp.events.OracleRequest({
     fromBlock: 0
   }, function (error, event) {
     if (error) console.log(error)
+    console.log("汤鸿")
     console.log(event)
+    
 });
 
 const app = express();

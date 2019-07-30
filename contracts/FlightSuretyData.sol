@@ -223,7 +223,7 @@ contract FlightSuretyData {
         // ****** 通过getFlightKey来获得key ****** 
         bytes32 flightKey = getFlightKey(airline, flight, timestamp);
         // ****** 判断是否已经注册了 ******
-        require(flights[flightKey].isRegistered ==true, "This flight has been registered");
+        require(flights[flightKey].isRegistered == false, "This flight has been registered");
        // ****** 修改对应的key的flight的状态 ******
        flights[flightKey] = Flight({
             isRegistered: true,
