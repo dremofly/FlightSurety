@@ -83,4 +83,13 @@ contract('Flight Surety Tests', async (accounts) => {
 
         await config.flightSuretyApp.fetchFlightStatus(address, flightNum, flightTime);
     });
+
+    it('Load events', async () => {
+        let events = config.flightSuretyData.allEvents({fromBlock: 0, toBlock: 'latest'});
+        console.log(events)
+        events.watch((error, result) => {
+            console.log(result.event);
+        });
+
+    });
 });
