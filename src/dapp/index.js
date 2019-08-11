@@ -17,7 +17,25 @@ import './flightsurety.css';
         });
     
 
+        
         // User-submitted transaction
+        DOM.elid('register-airline').addEventListener('click', () => {
+            let airline = DOM.elid('airline-address').value;
+            let name = DOM.elid('airline-name').value;
+            console.log(airline)
+            console.log(name)
+            contract.registerAirline(airline, name, (error, result) => {
+                //display('Register Airline', 'airline', 'nono')
+                console.log(result, error)
+            })
+        })
+
+        DOM.elid('fund-airline').addEventListener('click', () => {
+            let airline = DOM.elid('airline-address').value;
+            contract.fundAirline(airline, (error, result) => {
+                if(error) console.log(error)
+            })
+        })
         DOM.elid('submit-oracle').addEventListener('click', () => {
             let flight = DOM.elid('flight-number').value;
             // Write transaction
@@ -27,7 +45,7 @@ import './flightsurety.css';
         })
 
         DOM.elid('register-oracle').addEventListener('click', () => {
-            contract.registerOracle((error, result) => {
+            contract.regeisterOracle((error, result) => {
                 if(error) console.log(error)
                 //display('register', 'oracle register', 'status');
             });

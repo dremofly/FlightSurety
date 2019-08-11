@@ -29,7 +29,8 @@ export default class Contract {
             while(this.passengers.length < 5) {
                 this.passengers.push(accts[counter++]);
             }
-
+            console.log(this.airlines)
+            console.log(this.passengers)
             callback();
         });
     }
@@ -41,8 +42,31 @@ export default class Contract {
             .call({ from: self.owner}, callback);
     }
 
+    fundAirline(airline, callback) {
+        let self = this;
+        console.log("fund")
+        let account = self.web3.eth.getAccounts().then(console.log);
+        
+        
+        self.flightSuretyApp.methods.fund()
+            .send({from: account, value: Web3.utils.toWei('1', 'ether')}, (err, res) => {
+            callback(err, res)
+        })
+    }
+
+    registerAirline(airline, name, callback) {
+        let self = this;
+      
+        //  console.log(account)
+        self.flightSuretyApp.methods
+            .registerAirline(airline, name)
+            .send({from: airline}, (err, result) => {
+                callback(err, result)
+            });
+    }
     fetchFlightStatus(flight, callback) {
         let self = this;
+
         let payload = {
             airline: self.airlines[0],
             flight: flight,
