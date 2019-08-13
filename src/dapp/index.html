@@ -40,9 +40,10 @@
     <main class="container">
         <h2>Passenger: </h2>
         <label class="form">Select flight: </label>
-        <select id="flights"></select>
-        <label class="form">Airline Address: </label> <input type="text" id="airline-address2"><br>
-        <label class="form">Flight time: </label> <input type="text" id="flight-time2">
+        <select id="flights" ></select>
+        <br>
+        <label class="form">Airline Address: </label> <p id="airline-address2"></p><br>
+        <label class="form">Flight time: </label> <p id="flight-time2"></p>
         <label class="form">Insurance amount: </label> <input type="text" id="insurance-amount">
         <br><br>
         <btn class="btn btn-primary" id="buy-insurance">Buy Insurance</btn>
@@ -51,6 +52,23 @@
         <br><br>
         <label class="form">Flight Status: </label>
         <p id="status-wrapper"></p>
+    </main>
+
+    <main class="container">
+        <h2>Fetch Flight Status: </h2>
+        <label class="form">Select flight: </label>
+        <select id="flights"></select>
+        <label class="form">Airline Address: </label>
+        <p id="airline-address3"></p>
+        <label class="form">Flight time: </label>
+        <p id="flight-time3"></p>
+        <label class="form">Flight Status: </label>
+        <p id="flight-status"></p>
+        <label class="form">Withdraw: </label> <input type="text" id="withdraw"><br>
+        <br><br>
+        <btn class="btn btn-primary" id="check-flight-status">Check Flight Status</btn>
+        <br><br>
+        <btn class="btn btn-primary" id="get-flight">Get Flight</btn>
     </main>
 
 

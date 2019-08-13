@@ -1,38 +1,62 @@
 import FlightSuretyApp from '../../build/contracts/FlightSuretyApp.json';
+import FlightSuretyData from '../../build/contracts/FlightSuretyData.json'
 import Config from './config.json';
 import Web3 from 'web3';
 
 export default class Contract {
     constructor(network, callback) {
 
-        let config = Config[network];
-        this.web3 = new Web3(new Web3.providers.HttpProvider(config.url));
+        let config = Config[network];        
+        //this.web3 = new Web3(new Web3.providers.HttpProvider(config.url));
+        //await window.ethereum.enable();
+        //this.web3 = null;
+        this.initialize(config, callback);
+        //this.web3 = new Web3(window.ethereum);
+        
+    }
+
+    async initialize(config, callback) {
+        
+        await window.ethereum.enable()
+        console.log("here")
+        this.web3 = new Web3(window.ethereum)
         this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
-        this.initialize(callback);
+        this.flightSuretyData = new this.web3.eth.Contract(FlightSuretyData.abi, config.dataAddress);
         this.owner = null;
         this.airlines = [];
         this.passengers = [];
-        console.log(this.flightSuretyApp.methods)
-    }
-
-    initialize(callback) {
         this.web3.eth.getAccounts((error, accts) => {
            
             this.owner = accts[0];
+            console.log("account: ", accts[0])
 
             let counter = 1;
             
-            while(this.airlines.length < 5) {
-                this.airlines.push(accts[counter++]);
-            }
+            //while(this.airlines.length < 5) {
+            //    this.airlines.push(accts[counter++]);
+            //}
 
-            while(this.passengers.length < 5) {
-                this.passengers.push(accts[counter++]);
-            }
+            //while(this.passengers.length < 5) {
+            //    this.passengers.push(accts[counter++]);
+            //}
+            this.airlines.push(config.firstAirline)
             console.log(this.airlines)
             console.log(this.passengers)
-            callback();
+        
         });
+        console.log(this.flightSuretyData.methods)
+        let li = await this.flightSuretyData.methods.getAllAirlines().call()
+
+        console.log("airlines", li)
+
+        let fi = await this.flightSuretyData.methods.getAllFlights().call()
+        console.log("flight key: ", fi)
+
+        let fi2 = await this.flightSuretyData.methods.flights(fi[0]).call()
+        console.log("flight: ", fi2)
+        //let one = await this.flightSuretyData.methods.airlines(li[0]).call()
+        //console.log("a airline", one )
+        callback();
     }
 
     isOperational(callback) {
@@ -42,11 +66,29 @@ export default class Contract {
             .call({ from: self.owner}, callback);
     }
 
-    fundAirline(airline, callback) {
+    async registerAirline(airline, name, callback) {
+        console.log("register airline")
+        let self = this;
+
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
+        console.log(account)
+
+        self.flightSuretyApp.methods
+            .registerAirline(airline, name)
+            .send({from: account}, (err, result) => {
+                callback(err, result)
+            });
+        
+    }
+
+    async fundAirline(airline, callback) {
         let self = this;
         console.log("fund")
-        let account = self.web3.eth.getAccounts().then(console.log);
-        
+        //let account = self.web3.eth.getAccounts().then(console.log);
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
+        console.log(account) 
         
         self.flightSuretyApp.methods.fund()
             .send({from: account, value: Web3.utils.toWei('1', 'ether')}, (err, res) => {
@@ -54,16 +96,66 @@ export default class Contract {
         })
     }
 
-    registerAirline(airline, name, callback) {
+    async registerFlight(flight_num, flight_time, callback) {
         let self = this;
-      
-        //  console.log(account)
-        self.flightSuretyApp.methods
-            .registerAirline(airline, name)
-            .send({from: airline}, (err, result) => {
-                callback(err, result)
-            });
+        console.log("Register flight")
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
+        console.log(account)
+
+        self.flightSuretyApp.methods.registerFlight(flight_num, flight_time)
+            .send({from: account}, (err, res) => {callback(err, res)})
     }
+
+    async getFlight(callback) {
+        let self = this;
+        //let flights = await self.flightSuretyData.methods.getAllFlights().call();
+        let key = await self.flightSuretyData.methods.getAllFlights().call()
+        let name = []
+        for(let i=0; i<key.length; i++) {
+            let flight = await this.flightSuretyData.methods.flights(key[i]).call()
+            name.push(flight.flight)
+            console.log(flight)
+        }
+        callback(null, name)
+    }
+
+    async getFlightInfo(flight, callback) {
+        let self = this;
+        let key = await self.flightSuretyData.methods.getAllFlights().call()
+        console.log("input flight: ", flight)
+        for(let i=0; i<key.length; i++) {
+            let item = await this.flightSuretyData.methods.flights(key[i]).call()
+            console.log(item)
+            if(item.flight == flight) {
+                
+                callback(null, item)
+            }
+        }
+    }
+
+    async buyInsurance(airline, flight, timestamp, amount, callback) {
+        let self = this;
+        console.log("buy insurance")
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
+        console.log(account)
+        console.log(typeof(airline))
+        console.log(typeof(flight))
+        console.log(typeof(timestamp))
+        self.flightSuretyApp.methods
+            .buy(airline, flight, timestamp)
+            .send({from: account, value: Web3.utils.toWei(amount, 'ether')}, 
+            (err, res) => {
+                if(err) console.log(err)
+                callback(err, res)
+            })
+        
+        
+
+    }
+
+
     fetchFlightStatus(flight, callback) {
         let self = this;
 

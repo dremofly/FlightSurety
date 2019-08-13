@@ -24,6 +24,7 @@ contract FlightSuretyData {
         address[] approvedBy;
     }
     mapping(address => AirlineInfo) public airlines;
+    address[] public airline_list;
 
     struct Flight {
         bool isRegistered;
@@ -35,6 +36,7 @@ contract FlightSuretyData {
         mapping(address => uint256) passengersPaymentAmount;
     }
     mapping(bytes32 => Flight) public flights;
+    bytes32[] public flight_list;
 
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;                                    // Blocks all state changes throughout the contract if false
@@ -68,6 +70,7 @@ contract FlightSuretyData {
             name: 'First Airline',
             approvedBy: new address[](0)
         });
+        airline_list.push(firstAirlineAddress);
         registeredAirlinesCount = 1;
     }
 
@@ -208,6 +211,7 @@ contract FlightSuretyData {
         airlines[airline].isRegistered = true;
         airlines[airline].name = name;
         registeredAirlinesCount = registeredAirlinesCount + 1;
+        airline_list.push(airline);
     }
 
 
@@ -233,6 +237,7 @@ contract FlightSuretyData {
             flight: flight,
             insuredPassengers: new address[](0)
        });
+       flight_list.push(flightKey);
     }
     // TODO: 处理flight状态
     function processFlightStatus(bytes32 flightKey, uint8 statusCode) external 
@@ -336,6 +341,13 @@ contract FlightSuretyData {
         return keccak256(abi.encodePacked(airline, flight, timestamp));
     }
 
+    function getAllAirlines() external view returns(address[]) {
+        return airline_list;
+    }
+
+    function getAllFlights() external view returns(bytes32[]) {
+        return flight_list;
+    }
     /**
     * @dev Fallback function for funding smart contract.
     *

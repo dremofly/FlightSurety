@@ -5,7 +5,7 @@ import './flightsurety.css';
 
 
 (async() => {
-
+    
     let result = null;
 
     let contract = new Contract('localhost', () => {
@@ -18,7 +18,8 @@ import './flightsurety.css';
     
 
         
-        // User-submitted transaction
+        // Register Airline button function
+        // input: "airline-address", "airline-name"
         DOM.elid('register-airline').addEventListener('click', () => {
             let airline = DOM.elid('airline-address').value;
             let name = DOM.elid('airline-name').value;
@@ -30,12 +31,79 @@ import './flightsurety.css';
             })
         })
 
+        // Fund Airline function
+        // input: "airline-address"
         DOM.elid('fund-airline').addEventListener('click', () => {
             let airline = DOM.elid('airline-address').value;
             contract.fundAirline(airline, (error, result) => {
                 if(error) console.log(error)
             })
         })
+
+        // Register Flight function
+        // input: "flight number", "flight time"
+        DOM.elid('register-flight').addEventListener('click', () => {
+            let flight_num = DOM.elid('flight-number').value;
+            let flight_time = DOM.elid('flight-time').value;
+            contract.registerFlight(flight_num, flight_time, (error, result) => {
+                if(error) console.log(error)
+            })
+        })
+
+        // Flight
+        DOM.elid('get-flight').addEventListener('click', () => {
+            contract.getFlight((error, result) => {
+                if(error) console.log(error)
+                //console.log(result) //flights result
+                //let flights = DOM.elid('flights');
+                let flights = document.getElementById('flights')
+                
+                
+                // TODO: 清空下拉框
+                for(let i=0; i<result.length; i++) {
+                    
+                    flights.add(new Option(result[i], i))
+                }
+            })
+
+            
+        })
+
+        DOM.elid("flights").addEventListener("change", () => {
+            console.log("change")
+            let option = document.getElementById('flights')
+            let index = option.selectedIndex
+            console.log(index)
+            
+            console.log(option[index].text)
+            contract.getFlightInfo(option[index].text, (err, result) => {
+                if(err) console.log(err)
+                let airline_address2 = document.getElementById("airline-address2")
+                let flight_time2 = document.getElementById("flight-time2")
+                airline_address2.innerHTML = result.airline
+                flight_time2.innerHTML = result.updatedTimestamp
+            })
+        })
+
+        DOM.elid("buy-insurance").addEventListener("click", () => {
+            console.log("buy insurance")
+            let amount = DOM.elid("insurance-amount").value
+            let airline_address = document.getElementById("airline-address2").innerHTML
+            let option = document.getElementById("flights")
+            let index = option.selectedIndex
+            let flight = option[index].text
+
+            let flight_time = document.getElementById("flight-time2").innerHTML
+            console.log(amount)
+            console.log(airline_address)
+            console.log(flight)
+            console.log(flight_time)
+            contract.buyInsurance(airline_address, flight, flight_time, amount, (err, result) => {
+                if(err) console.log(err)
+
+            })
+        })
+
         DOM.elid('submit-oracle').addEventListener('click', () => {
             let flight = DOM.elid('flight-number').value;
             // Write transaction
