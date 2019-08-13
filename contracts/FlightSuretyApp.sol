@@ -222,7 +222,8 @@ contract FlightSuretyApp {
         // TODO: 值
         require(msg.value<=1 ether, "Passenger can't insure for more than 1 ether");
         bytes32 flightKey = getFlightKey(airline, flight, timestamp);
-        dataContract.buy(flightKey, msg.sender);
+        uint256 price = uint256(msg.value);
+        dataContract.buy(flightKey, msg.sender, price);
     }
 
 
@@ -419,10 +420,11 @@ contract FlightSuretyData {
     function buy
                             (
                                 bytes32 flightKey, 
-                                address passenger
+                                address passenger,
+                                uint256 price
                             )
-                            external
-                            payable;
+                            external;
+                            //payable;
     function pay
                             (
                                 address account

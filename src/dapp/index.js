@@ -17,6 +17,10 @@ import './flightsurety.css';
         });
     
         //await contract.registerOracle()
+        contract.getAirlineCount((error, result) => {
+            document.getElementById('airline-count').innerHTML = result
+        })
+        
         
         // Register Airline button function
         // input: "airline-address", "airline-name"
@@ -69,6 +73,7 @@ import './flightsurety.css';
 
         })
 
+        // listen to the event of select
         DOM.elid("flights").addEventListener("change", () => {
             console.log("change")
             let option = document.getElementById('flights')
@@ -104,10 +109,54 @@ import './flightsurety.css';
             })
         })
 
-        DOM.elid('submit-oracle').addEventListener('click', () => {
-            let flight = DOM.elid('flight-number').value;
+        // Pay insurance的get Flight
+        DOM.elid("get-flight2").addEventListener("click", () => {
+            console.log("get flight2")
+            contract.getFlight((error, result) => {
+                if(error) console.log(error)
+                //console.log(result) //flights result
+                //let flights = DOM.elid('flights');
+                let flights = document.getElementById('flights2')
+                
+                
+                // TODO: 清空下拉框
+                for(let i=0; i<result.length; i++) {
+                    
+                    flights.add(new Option(result[i], i))
+                }
+            }) 
+        })
+
+        // listen to the event of the select
+        DOM.elid("flights2").addEventListener("change", () => {
+            console.log("change")
+            let option = document.getElementById('flights2')
+            let index = option.selectedIndex
+            console.log(index)
+            
+            console.log(option[index].text)
+            contract.getFlightInfo(option[index].text, (err, result) => {
+                if(err) console.log(err)
+                let airline_address2 = document.getElementById("airline-address3")
+                let flight_time2 = document.getElementById("flight-time3")
+                airline_address2.innerHTML = result.airline
+                flight_time2.innerHTML = result.updatedTimestamp
+            })
+        })
+
+        DOM.elid('check-flight-status').addEventListener('click', () => {
+            
+            let airline_address = document.getElementById("airline-address3").innerHTML
+            let option = document.getElementById("flights2")
+            let index = option.selectedIndex
+            let flight = option[index].text 
+            let flight_time = document.getElementById("flight-time3").innerHTML
+            
+            console.log(airline_address)
+            console.log(flight)
+            console.log(flight_time)
             // Write transaction
-            contract.fetchFlightStatus(flight, (error, result) => {
+            contract.fetchFlightStatus(airline_address, flight, flight_time, (error, result) => {
                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
             });
         })
@@ -118,7 +167,28 @@ import './flightsurety.css';
                 //display('register', 'oracle register', 'status');
             });
         })
-    
+        
+        // get passenger balance
+        DOM.elid('get-passenger').addEventListener('click', () => {
+            contract.getPassengerBalance((error, result) => {
+                if(error) console.log(error)
+                console.log(result)
+            })
+        })
+
+        // get passenger insured amount
+        DOM.elid('get-passenger-insured-amount').addEventListener('click', () => {
+            let airline_address = document.getElementById("airline-address3").innerHTML
+            let option = document.getElementById("flights2")
+            let index = option.selectedIndex
+            let flight = option[index].text 
+            let flight_time = document.getElementById("flight-time3").innerHTML
+
+            contract.getPassengerInsuredAmount(airline_address, flight, flight_time, (error, result) => {
+                if(error) console.log(error)
+                console.log(result)
+            })
+        })
     });
     
 

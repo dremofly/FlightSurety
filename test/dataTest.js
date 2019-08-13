@@ -84,6 +84,14 @@ contract('Flight Surety Tests', async (accounts) => {
         await config.flightSuretyApp.fetchFlightStatus(address, flightNum, flightTime);
     });
 
+    it('[Passenger] Check payment amount', async () => {
+        let flightNum = 'D3238';
+        let address = config.firstAirline;
+
+        await config.flightSuretyData.getPassengerInsuredAmount(address, flightNum, flightTime, accounts[7])
+        
+    })
+
     it('Load events', async () => {
         let events = config.flightSuretyData.allEvents({fromBlock: 0, toBlock: 'latest'});
         console.log(events)

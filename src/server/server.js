@@ -40,7 +40,24 @@ var gasPrice = 100000000000;
     .on('error', error => {console.log(error)})
     .on('data', async data => {
       console.log("********************* Flight Status Info **************")
+      const index = data.returnValues.index;
+      const airline = data.returnValues.airline;
+      const flight = data.returnValues.flight;
+      const timestamp = data.returnValues.timestamp;
+      console.log(`Flight Info: index(${index}), airline(${airline}), flight(${flight}), timestamp(${timestamp})`)
     })
+
+    flightSuretyData.events.FlightStatusUpdated()
+    .on('error', error => {console.log(error)})
+    .on('data', async data => {
+      console.log("****************** FlightStatusUpdated ******************")
+    })
+
+    flightSuretyData.events.AmountRefundedToPassengerBalance()
+      .on('error', error => {console.log(error)})
+      .on('data', async data => {
+        console.log("****************** AmountRefundedToPassengerBalance ******************")
+      })
 
   var accountsList = await web3.eth.getAccounts()
   console.log("AccountsList length: ", JSON.stringify(accountsList.length))
@@ -88,7 +105,7 @@ let submitOracleResponses = async function (flight, airline, timestamp) {
     })
     console.log(`oracle: ${oracle}, index: ${oracleIndexes}`)
     oracleIndexes.forEach(async index => {
-      const statusCode = 20;//getRandomInt(3) * 10
+      const statusCode = 20//getRandomInt(3) * 10
       try {
         console.log(`oracle : ${oracle}, index: ${index}, code: ${statusCode}`)
         await flightSuretyApp.methods.submitOracleResponse(

@@ -263,14 +263,17 @@ contract FlightSuretyData {
     function buy
                             (
                                 bytes32 flightKey,          
-                                address passenger                   
+                                address passenger,  
+                                uint256 price                 
                             )   
                             external
-                            payable
+                            //payable
     {
         require(flights[flightKey].isRegistered, "This filight hasn't been registered!");
 
-        flights[flightKey].passengersPaymentAmount[passenger] = uint256(msg.value);
+        //flights[flightKey].passengersPaymentAmount[passenger] = uint256(msg.value);        
+        //flights[flightKey].passengersPaymentAmount[passenger] = uint256(0.5 ether);   //可以
+        flights[flightKey].passengersPaymentAmount[passenger] = price; 
         flights[flightKey].insuredPassengers.push(passenger);
     }
 

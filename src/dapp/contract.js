@@ -66,13 +66,26 @@ export default class Contract {
             .call({ from: self.owner}, callback);
     }
 
+    // 得到airline的数量
+    async getAirlineCount(callback) {
+        let self = this;
+        console.log("get airline count")
+        console.log(self.flightSuretyData.methods)
+        self.flightSuretyData.methods
+            .getRegisteredAirlinesCount()
+            .call({ from: self.owner}, (err, res) => {
+                console.log(res)
+                callback(err, res)
+            })
+    }
+
     async registerAirline(airline, name, callback) {
         console.log("register airline")
         let self = this;
 
         let accounts = await self.web3.eth.getAccounts()
         let account = accounts[0]
-        console.log(account)
+        console.log("typeof account", typeof(account))
 
         self.flightSuretyApp.methods
             .registerAirline(airline, name)
@@ -142,9 +155,13 @@ export default class Contract {
         console.log(account)
         console.log(typeof(airline))
         console.log(typeof(flight))
+        timestamp = parseInt(timestamp)
         console.log(typeof(timestamp))
+        
+        console.log(amount)
         self.flightSuretyApp.methods
             .buy(airline, flight, timestamp)
+            //.buy("0x9E67c0728A8A98ADc3c067c07539b7C3f41E94Cc", "flight1", 1523523534)
             .send({from: account, value: Web3.utils.toWei(amount, 'ether')}, 
             (err, res) => {
                 if(err) console.log(err)
@@ -156,20 +173,48 @@ export default class Contract {
     }
 
 
-    fetchFlightStatus(flight, callback) {
-        let self = this;
-        
-        let payload = {
-            airline: "0x9E67c0728A8A98ADc3c067c07539b7C3f41E94Cc",
-            flight: "flight2",
-            //timestamp: Math.floor(Date.now() / 1000)
-            timestamp: 1523523534
-        } 
+    async fetchFlightStatus(airline, flight, timestamp, callback) {
+        console.log("fetch flight status")
+        let self = this;  
+        //let payload = {
+        //    airline: "0x9E67c0728A8A98ADc3c067c07539b7C3f41E94Cc",
+        //    flight: "flight2",
+        //    //timestamp: Math.floor(Date.now() / 1000)
+        //    timestamp: 1523523534
+        //} 
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
         self.flightSuretyApp.methods
-            .fetchFlightStatus(payload.airline, payload.flight, payload.timestamp)
-            .send({ from: payload.airline}, (error, result) => {
+            .fetchFlightStatus(airline, flight, timestamp)
+            .send({ from: account}, (error, result) => {
                 callback(error, result);
             });
+    }
+
+    async getPassengerBalance(callback) {
+        console.log("get passenger balance")
+        let self = this
+
+        self.flightSuretyData.methods
+            .passengersBalances("0xFafe970073235B000838eD1FB6321D6DaC9058E9")
+            .call((error, result) => {
+                callback(error, result)
+            })
+    }
+
+    // 获取某个airline的passenger的balance
+    async getPassengerInsuredAmount(airline, flight, timestamp, callback) {
+        console.log("get passenger insured Amount")
+        let self = this
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
+        timestamp = parseInt(timestamp)
+        self.flightSuretyData.methods
+            .getPassengerInsuredAmount(airline, flight, timestamp,             "0xFafe970073235B000838eD1FB6321D6DaC9058E9")
+            //.getPassengerInsuredAmount("0x9E67c0728A8A98ADc3c067c07539b7C3f41E94Cc", "flight1", 1523523534, "0xFafe970073235B000838eD1FB6321D6DaC9058E9")
+            .call((error, result) => {
+                callback(error, result)
+            })
     }
 
     registerOracle(callback) {
