@@ -44,16 +44,16 @@ export default class Contract {
             console.log(this.passengers)
         
         });
-        console.log(this.flightSuretyData.methods)
-        let li = await this.flightSuretyData.methods.getAllAirlines().call()
+        //console.log(this.flightSuretyData.methods)
+        //let li = await this.flightSuretyData.methods.getAllAirlines().call()
 
-        console.log("airlines", li)
+        //console.log("airlines", li)
 
-        let fi = await this.flightSuretyData.methods.getAllFlights().call()
-        console.log("flight key: ", fi)
+        //let fi = await this.flightSuretyData.methods.getAllFlights().call()
+        //console.log("flight key: ", fi)
 
-        let fi2 = await this.flightSuretyData.methods.flights(fi[0]).call()
-        console.log("flight: ", fi2)
+        //let fi2 = await this.flightSuretyData.methods.flights(fi[0]).call()
+        //console.log("flight: ", fi2)
         //let one = await this.flightSuretyData.methods.airlines(li[0]).call()
         //console.log("a airline", one )
         callback();
@@ -158,16 +158,17 @@ export default class Contract {
 
     fetchFlightStatus(flight, callback) {
         let self = this;
-
+        
         let payload = {
-            airline: self.airlines[0],
-            flight: flight,
-            timestamp: Math.floor(Date.now() / 1000)
+            airline: "0x9E67c0728A8A98ADc3c067c07539b7C3f41E94Cc",
+            flight: "flight2",
+            //timestamp: Math.floor(Date.now() / 1000)
+            timestamp: 1523523534
         } 
         self.flightSuretyApp.methods
             .fetchFlightStatus(payload.airline, payload.flight, payload.timestamp)
-            .send({ from: self.owner}, (error, result) => {
-                callback(error, payload);
+            .send({ from: payload.airline}, (error, result) => {
+                callback(error, result);
             });
     }
 

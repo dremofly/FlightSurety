@@ -335,7 +335,8 @@ contract FlightSuretyApp {
             emit FlightStatusInfo(airline, flight, timestamp, statusCode);
 
             // Handle flight status as appropriate
-            dataContract.processFlightStatus(key, statusCode);
+            bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+            dataContract.processFlightStatus(flightKey, statusCode);
         }
     }
 

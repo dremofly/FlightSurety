@@ -7,16 +7,16 @@ import './flightsurety.css';
 (async() => {
     
     let result = null;
-
-    let contract = new Contract('localhost', () => {
+    
+    let contract = new Contract('localhost', async () => {
 
         // Read transaction
         contract.isOperational((error, result) => {
             console.log(error,result);
-            display('Operational Statuss', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
+            display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
         });
     
-
+        //await contract.registerOracle()
         
         // Register Airline button function
         // input: "airline-address", "airline-name"
@@ -66,7 +66,7 @@ import './flightsurety.css';
                 }
             })
 
-            
+
         })
 
         DOM.elid("flights").addEventListener("change", () => {
