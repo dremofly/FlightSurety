@@ -307,9 +307,8 @@ contract FlightSuretyData {
                                 address passenger
                             )
                             external
-                            payable
     {
-        require(passengersBalances[passenger]>=0, "This passenger has no balance.");
+        require(passengersBalances[passenger]>0, "This passenger has no balance.");
 
         uint256 value = passengersBalances[passenger];
         passengersBalances[passenger] = 0;

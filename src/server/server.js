@@ -68,7 +68,7 @@ var gasPrice = 100000000000;
     try {
       await flightSuretyApp.methods.registerOracle().send({
         from: account,
-        value: web3.utils.toWei('1', 'ether'),
+        value: web3.utils.toWei('10', 'ether'),
         gas: gasLimit, 
         gasPrice: gasPrice
       })

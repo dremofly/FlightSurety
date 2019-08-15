@@ -173,6 +173,7 @@ import './flightsurety.css';
             contract.getPassengerBalance((error, result) => {
                 if(error) console.log(error)
                 console.log(result)
+                alert("The passenger balance is " + result/1000000000000000000)
             })
         })
 
@@ -187,7 +188,20 @@ import './flightsurety.css';
             contract.getPassengerInsuredAmount(airline_address, flight, flight_time, (error, result) => {
                 if(error) console.log(error)
                 console.log(result)
+                alert("The insured amount is " + result/1000000000000000000)
             })
+        })
+        
+        // withdraw
+        DOM.elid('withdraw-btn').addEventListener('click', () => {
+            let amount = DOM.elid("insurance-amount").value
+
+            contract.withdraw(amount,   
+                (error, result) => {
+                    if(error) console.log(error)
+                    console.log(result)
+                }
+            )
         })
     });
     

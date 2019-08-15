@@ -159,10 +159,11 @@ export default class Contract {
         console.log(typeof(timestamp))
         
         console.log(amount)
+        console.log(typeof(amount))
         self.flightSuretyApp.methods
             .buy(airline, flight, timestamp)
             //.buy("0x9E67c0728A8A98ADc3c067c07539b7C3f41E94Cc", "flight1", 1523523534)
-            .send({from: account, value: Web3.utils.toWei(amount, 'ether')}, 
+            .send({from: account, value: Web3.utils.toWei('0.1', 'ether')}, 
             (err, res) => {
                 if(err) console.log(err)
                 callback(err, res)
@@ -194,9 +195,10 @@ export default class Contract {
     async getPassengerBalance(callback) {
         console.log("get passenger balance")
         let self = this
-
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
         self.flightSuretyData.methods
-            .passengersBalances("0xFafe970073235B000838eD1FB6321D6DaC9058E9")
+            .passengersBalances(account)
             .call((error, result) => {
                 callback(error, result)
             })
@@ -210,12 +212,27 @@ export default class Contract {
         let account = accounts[0]
         timestamp = parseInt(timestamp)
         self.flightSuretyData.methods
-            .getPassengerInsuredAmount(airline, flight, timestamp,             "0xFafe970073235B000838eD1FB6321D6DaC9058E9")
+            .getPassengerInsuredAmount(airline, flight, timestamp, account)
             //.getPassengerInsuredAmount("0x9E67c0728A8A98ADc3c067c07539b7C3f41E94Cc", "flight1", 1523523534, "0xFafe970073235B000838eD1FB6321D6DaC9058E9")
             .call((error, result) => {
                 callback(error, result)
             })
     }
+
+    // withdraw function
+    async withdraw(amount, callback) {
+        console.log("Withdraw")
+        let self = this
+        let accounts = await self.web3.eth.getAccounts()
+        let account = accounts[0]
+        //let price = Web3.utils.toWei(amount)
+        self.flightSuretyApp.methods
+            .pay(account)
+            .send({from: account, gas: 8000000}, (error, result) => {
+                callback(error, result)
+            })
+    }
+
 
     registerOracle(callback) {
        let self = this;

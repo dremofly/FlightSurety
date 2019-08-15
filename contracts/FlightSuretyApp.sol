@@ -215,6 +215,7 @@ contract FlightSuretyApp {
        require(!airlineFunded, "Airline has be funded");
        require(msg.value >= 1 ether, "The value is not enough. At least 1 ether");
        dataContract.fund(msg.sender);
+       dataContract.call.value(msg.value)();
     }
 
     function buy(address airline, string flight, uint256 timestamp) external payable 
@@ -224,6 +225,12 @@ contract FlightSuretyApp {
         bytes32 flightKey = getFlightKey(airline, flight, timestamp);
         uint256 price = uint256(msg.value);
         dataContract.buy(flightKey, msg.sender, price);
+        dataContract.call.value(msg.value)();
+    }
+
+    function pay(address passenger) external 
+    {
+        dataContract.pay(passenger);
     }
 
 
@@ -233,7 +240,7 @@ contract FlightSuretyApp {
     uint8 private nonce = 0;    
 
     // Fee to be paid when registering oracle
-    uint256 public constant REGISTRATION_FEE = 1 ether;
+    uint256 public constant REGISTRATION_FEE = 10 ether;
 
     // Number of oracles that must respond for valid status
     uint256 private constant MIN_RESPONSES = 0;
