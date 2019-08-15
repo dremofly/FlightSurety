@@ -104,7 +104,7 @@ export default class Contract {
         console.log(account) 
         
         self.flightSuretyApp.methods.fund()
-            .send({from: account, value: Web3.utils.toWei('1', 'ether')}, (err, res) => {
+            .send({from: account, value: Web3.utils.toWei('10', 'ether')}, (err, res) => {
             callback(err, res)
         })
     }

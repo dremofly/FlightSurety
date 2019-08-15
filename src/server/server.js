@@ -4,6 +4,7 @@ import Config from './config.json';
 import Web3 from 'web3';
 import express from 'express';
 require('babel-polyfill')
+require('bignumber.js')
 const bodyParser = require('body-parser')
 
 let config = Config['localhost'];
@@ -16,12 +17,17 @@ var oraclesList = [];
 var gasLimit = 4712388;
 var gasPrice = 100000000000;
 
+let getRandomInt = function (max) {
+  return Math.floor(Math.random() * Math.floor(max));
+};
+
 (async function initializeApp() {
 
 
   flightSuretyApp.events.OracleRequest()
     .on('error', error => { console.log(error) })
-    .on('data', async data => {
+    .on('changed', async data => {
+      console.log("here")
       console.log("****************** oracle request received ******************")
       const airline = data.returnValues.airline;
       const flight = data.returnValues.flight;
@@ -33,7 +39,8 @@ var gasPrice = 100000000000;
   flightSuretyApp.events.OracleReport()
     .on('error', error => {console.log(error) })
     .on('data', async data => {
-      console.log("*************** oracle report ******************")
+      const status = data.returnValues.statusCode;
+      console.log(`*************** oracle report [status code: ${status}]******************`)
     })
 
   flightSuretyApp.events.FlightStatusInfo()
@@ -63,7 +70,7 @@ var gasPrice = 100000000000;
   console.log("AccountsList length: ", JSON.stringify(accountsList.length))
 
   console.log("registering oracles...")
-  accountsList.slice(Math.max(accountsList.length-5,1))
+  accountsList.slice(Math.max(accountsList.length-20,1))
   .forEach(async account => {
     try {
       await flightSuretyApp.methods.registerOracle().send({
@@ -105,7 +112,7 @@ let submitOracleResponses = async function (flight, airline, timestamp) {
     })
     console.log(`oracle: ${oracle}, index: ${oracleIndexes}`)
     oracleIndexes.forEach(async index => {
-      const statusCode = 20//getRandomInt(3) * 10
+      const statusCode = getRandomInt(5) * 10
       try {
         console.log(`oracle : ${oracle}, index: ${index}, code: ${statusCode}`)
         await flightSuretyApp.methods.submitOracleResponse(

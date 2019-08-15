@@ -243,7 +243,7 @@ contract FlightSuretyApp {
     uint256 public constant REGISTRATION_FEE = 10 ether;
 
     // Number of oracles that must respond for valid status
-    uint256 private constant MIN_RESPONSES = 0;
+    uint256 private constant MIN_RESPONSES = 3;
 
 
     struct Oracle {
@@ -346,6 +346,7 @@ contract FlightSuretyApp {
             bytes32 flightKey = getFlightKey(airline, flight, timestamp);
             dataContract.processFlightStatus(flightKey, statusCode);
         }
+        // TODO: 清空oracleResponses[key].responses[statusCode].length
     }
 
 

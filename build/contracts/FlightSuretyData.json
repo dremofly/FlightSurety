@@ -17408,12 +17408,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x3474988eb24f3E7C009f8Cdb7AF1446CC0159000",
-      "transactionHash": "0xf8b6278fbdc48ad33dd64adf05e344e300035394b6a3344294ae0d33f3df560e"
+      "address": "0xAB547bC82E0270BE7158bc7A802E3f1795335b95",
+      "transactionHash": "0x60529a031996b7e501399df5f5f3755e6c0795689566a1005abb3225b8e06e9a"
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-08-15T13:21:30.349Z",
+  "updatedAt": "2019-08-15T13:51:49.718Z",
   "devdoc": {
     "methods": {
       "buy(bytes32,address,uint256)": {
