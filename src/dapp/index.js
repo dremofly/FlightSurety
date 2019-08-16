@@ -160,13 +160,6 @@ import './flightsurety.css';
                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
             });
         })
-
-        DOM.elid('register-oracle').addEventListener('click', () => {
-            contract.regeisterOracle((error, result) => {
-                if(error) console.log(error)
-                //display('register', 'oracle register', 'status');
-            });
-        })
         
         // get passenger balance
         DOM.elid('get-passenger').addEventListener('click', () => {

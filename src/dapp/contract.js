@@ -18,7 +18,6 @@ export default class Contract {
     async initialize(config, callback) {
         
         await window.ethereum.enable()
-        console.log("here")
         this.web3 = new Web3(window.ethereum)
         this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
         this.flightSuretyData = new this.web3.eth.Contract(FlightSuretyData.abi, config.dataAddress);
