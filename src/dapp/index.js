@@ -13,7 +13,7 @@ import './flightsurety.css';
         // Read transaction
         contract.isOperational((error, result) => {
             console.log(error,result);
-            display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
+            display('Operational Status', 'Check if contract is operational');
         });
     
         //await contract.registerOracle()
@@ -30,7 +30,7 @@ import './flightsurety.css';
             console.log(airline)
             console.log(name)
             contract.registerAirline(airline, name, (error, result) => {
-                //display('Register Airline', 'airline', 'nono')
+                display('Register Airline', `airline address: ${airline}, airline name: ${name}`)
                 console.log(result, error)
             })
         })
@@ -38,9 +38,9 @@ import './flightsurety.css';
         // Fund Airline function
         // input: "airline-address"
         DOM.elid('fund-airline').addEventListener('click', () => {
-            let airline = DOM.elid('airline-address').value;
-            contract.fundAirline(airline, (error, result) => {
+            contract.fundAirline((error, result) => {
                 if(error) console.log(error)
+                display('Fund airline', ' ')
             })
         })
 
@@ -51,6 +51,7 @@ import './flightsurety.css';
             let flight_time = DOM.elid('flight-time').value;
             contract.registerFlight(flight_num, flight_time, (error, result) => {
                 if(error) console.log(error)
+                display('Register flight ', `flight number: ${flight_num}, flight time: ${flight_time}`)
             })
         })
 
@@ -74,6 +75,7 @@ import './flightsurety.css';
         })
 
         // listen to the event of select
+        // TODO: 
         DOM.elid("flights").addEventListener("change", () => {
             console.log("change")
             let option = document.getElementById('flights')
@@ -90,6 +92,7 @@ import './flightsurety.css';
             })
         })
 
+        
         DOM.elid("buy-insurance").addEventListener("click", () => {
             console.log("buy insurance")
             let amount = DOM.elid("insurance-amount").value
@@ -99,13 +102,9 @@ import './flightsurety.css';
             let flight = option[index].text
 
             let flight_time = document.getElementById("flight-time2").innerHTML
-            console.log(amount)
-            console.log(airline_address)
-            console.log(flight)
-            console.log(flight_time)
             contract.buyInsurance(airline_address, flight, flight_time, amount, (err, result) => {
                 if(err) console.log(err)
-
+                display('Buy insurance', `Airline address: ${airline_address}, flight number: ${flight}, flight time: ${flight_time}, amount: ${amount}`)
             })
         })
 
@@ -117,8 +116,6 @@ import './flightsurety.css';
                 //console.log(result) //flights result
                 //let flights = DOM.elid('flights');
                 let flights = document.getElementById('flights2')
-                
-                
                 // TODO: 清空下拉框
                 for(let i=0; i<result.length; i++) {
                     
@@ -157,7 +154,7 @@ import './flightsurety.css';
             console.log(flight_time)
             // Write transaction
             contract.fetchFlightStatus(airline_address, flight, flight_time, (error, result) => {
-                display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
+                display('Oracles', 'Trigger oracles');
             });
         })
         
@@ -193,6 +190,7 @@ import './flightsurety.css';
                 (error, result) => {
                     if(error) console.log(error)
                     console.log(result)
+                    display('Withdraw', 'with draw the money')
                 }
             )
         })
@@ -202,7 +200,7 @@ import './flightsurety.css';
 })();
 
 
-function display(title, description, results) {
+function display(title, description) {
     let displayDiv = DOM.elid("display-wrapper");
     let section = DOM.section();
     let d = new Date()
@@ -210,14 +208,6 @@ function display(title, description, results) {
     let date = new Date(d2);
     let content = title + ': ' + description + ' ' + date;
     section.appendChild(DOM.p(content))
-    //section.appendChild(DOM.p(title));
-    //section.appendChild(DOM.p(description));
-    //results.map((result) => {
-    //    let row = section.appendChild(DOM.div({className:'row'}));
-    //    row.appendChild(DOM.div({className: 'col-sm-4 field'}, result.label));
-    //    row.appendChild(DOM.div({className: 'col-sm-8 field-value'}, result.error ? String(result.error) : String(result.value)));
-    //    section.appendChild(row);
-    //})
     displayDiv.append(section);
 
 }

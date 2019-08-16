@@ -94,7 +94,7 @@ export default class Contract {
         
     }
 
-    async fundAirline(airline, callback) {
+    async fundAirline(callback) {
         let self = this;
         console.log("fund")
         //let account = self.web3.eth.getAccounts().then(console.log);
