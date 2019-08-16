@@ -26,7 +26,7 @@ let getRandomInt = function (max) {
 
   flightSuretyApp.events.OracleRequest()
     .on('error', error => { console.log(error) })
-    .on('changed', async data => {
+    .on('data', async data => {
       console.log("here")
       console.log("****************** oracle request received ******************")
       const airline = data.returnValues.airline;
@@ -41,6 +41,7 @@ let getRandomInt = function (max) {
     .on('data', async data => {
       const status = data.returnValues.statusCode;
       console.log(`*************** oracle report [status code: ${status}]******************`)
+      console.log(status)
     })
 
   flightSuretyApp.events.FlightStatusInfo()

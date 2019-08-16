@@ -335,15 +335,16 @@ contract FlightSuretyApp {
 
         oracleResponses[key].responses[statusCode].push(msg.sender);
 
+        bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+        require(dataContract.getFlightKeyStatus(flightKey)==0, "This oracles reponses has been submitted");
         // Information isn't considered verified until at least MIN_RESPONSES
         // oracles respond with the *** same *** information
         emit OracleReport(airline, flight, timestamp, statusCode);
         if (oracleResponses[key].responses[statusCode].length >= MIN_RESPONSES) {
-
             emit FlightStatusInfo(airline, flight, timestamp, statusCode);
 
             // Handle flight status as appropriate
-            bytes32 flightKey = getFlightKey(airline, flight, timestamp);
+            
             dataContract.processFlightStatus(flightKey, statusCode);
         }
         // TODO: 清空oracleResponses[key].responses[statusCode].length
@@ -459,6 +460,8 @@ contract FlightSuretyData {
     function getAirlineApprovalList(address airline)
     external
     returns (address[]);
+
+    function getFlightKeyStatus(bytes32 flightKey) external returns(uint8);
 
     function addToAirlineApprovalList(address airline, address approver)
     external;

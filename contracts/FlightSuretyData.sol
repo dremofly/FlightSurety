@@ -190,6 +190,10 @@ contract FlightSuretyData {
         return flights[key].passengersPaymentAmount[passenger];
     }
 
+    function getFlightKeyStatus(bytes32 flightKey) external returns(uint8) {
+        return flights[flightKey].statusCode;
+    }
+
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
