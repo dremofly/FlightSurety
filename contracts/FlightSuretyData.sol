@@ -109,9 +109,13 @@ contract FlightSuretyData {
     }
 
 
-    //TODO: 使得只有apcontract可以调用这个datacontract
     modifier requireAuthorizedCaller() {
         require(authorizedContracts[msg.sender] == true, "The app contract is not authorized!");
+        _;
+    }
+
+    modifier requireAirlineFunded(address airline) {
+        require(airlines[airline].isFunded, "The airline should be funded");
         _;
     }
 
@@ -211,6 +215,7 @@ contract FlightSuretyData {
                             external
                             requireIsOperational
                             requireValidAddress(airline)
+                            requireAirlineFunded(airline)
     {
         airlines[airline].isRegistered = true;
         airlines[airline].name = name;
@@ -225,7 +230,7 @@ contract FlightSuretyData {
         airlines[airline].approvedBy.push(approver);
     }
 
-    function registerFlight (string flight, address airline, uint256 timestamp) external
+    function registerFlight (string flight, address airline, uint256 timestamp) external requireAirlineFunded(airline) 
     {
         // TODO: 前面两个过程是否可以调换
         // ****** 通过getFlightKey来获得key ****** 
