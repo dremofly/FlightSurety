@@ -9,6 +9,11 @@ To install, download or clone the repo, then:
 `truffle compile`
 `truffle migrate`
 
+To test
+`truffle test test/dataTest.js`
+
+Note that you should change the address of `firstAirline` in `migrations/2_deploy_contracts.js` before truffle migrate and test.
+
 ## Client
 
 To use the dapp:
