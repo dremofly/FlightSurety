@@ -215,7 +215,7 @@ contract FlightSuretyData {
                             external
                             requireIsOperational
                             requireValidAddress(airline)
-                            requireAirlineFunded(airline)
+                            requireAirlineFunded(tx.origin)
     {
         airlines[airline].isRegistered = true;
         airlines[airline].name = name;

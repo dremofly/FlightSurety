@@ -213,7 +213,7 @@ contract FlightSuretyApp {
        (airlineRegistered, airlineFunded, approvedByLength) = dataContract.getAirlineInfo(msg.sender);
        require(airlineRegistered, "Airline hasn't be registered.");
        require(!airlineFunded, "Airline has be funded");
-       require(msg.value >= 1 ether, "The value is not enough. At least 1 ether");
+       require(msg.value >= 10 ether, "The value is not enough. At least 10 ether");
        dataContract.fund(msg.sender);
        dataContract.call.value(msg.value)();
     }
