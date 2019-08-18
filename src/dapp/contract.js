@@ -16,7 +16,7 @@ export default class Contract {
     }
 
     async initialize(config, callback) {
-        
+        console.log("enable")
         await window.ethereum.enable()
         this.web3 = new Web3(window.ethereum)
         this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
@@ -25,7 +25,7 @@ export default class Contract {
         this.airlines = [];
         this.passengers = [];
         this.web3.eth.getAccounts((error, accts) => {
-           
+            if (error) console.log(error)
             this.owner = accts[0];
             console.log("account: ", accts[0])
 

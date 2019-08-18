@@ -18,10 +18,16 @@ import './flightsurety.css';
     
         //await contract.registerOracle()
         contract.getAirlineCount((error, result) => {
+            if(error) console.log(error)
             document.getElementById('airline-count').innerHTML = result
         })
         
-        
+        window.addEventListener('load', async () => {
+            if(window.ethereum) {
+                await ethereum.enable()
+                console.log('Enable')
+            }
+        })
         // Register Airline button function
         // input: "airline-address", "airline-name"
         DOM.elid('register-airline').addEventListener('click', () => {
