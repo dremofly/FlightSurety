@@ -27,7 +27,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
     // register first airline
     it('[Airline] Register an airline', async () => {
-        let fund = web3.utils.toWei('1', 'ether')
+        let fund = web3.utils.toWei('10', 'ether')
         console.log("Register an airline")
         await config.flightSuretyApp.fund({from:config.firstAirline, value:fund})
         console.log("Successfully fund")
@@ -51,7 +51,7 @@ contract('Flight Surety Tests', async (accounts) => {
     // votes
     it('[Airline] Votes for the 5th airline', async () => {
         // fund former airlines
-        let fund = web3.utils.toWei('1', 'ether')
+        let fund = web3.utils.toWei('10', 'ether')
         await config.flightSuretyApp.fund({from:accounts[2], value:fund})
         await config.flightSuretyApp.fund({from:accounts[3], value:fund})
         await config.flightSuretyApp.fund({from:accounts[4], value:fund})
@@ -91,13 +91,4 @@ contract('Flight Surety Tests', async (accounts) => {
         await config.flightSuretyData.getPassengerInsuredAmount(address, flightNum, flightTime, accounts[7])
         
     })
-
-    it('Load events', async () => {
-        let events = config.flightSuretyData.allEvents({fromBlock: 0, toBlock: 'latest'});
-        console.log(events)
-        events.watch((error, result) => {
-            console.log(result.event);
-        });
-
-    });
 });
