@@ -167,13 +167,13 @@ contract FlightSuretyData {
         return airlines[airline].isRegistered;
     } 
 
-    // TODO: 获取目前有多少的airline注册了
+    
     function getRegisteredAirlinesCount() external returns(uint256)
     {
         return registeredAirlinesCount;
     }
 
-    // TODO: 获取airline的信息
+
     function getAirlineInfo(address airline) external returns(bool isRegistered, bool isFunded, uint256 numOfApproved)
     {
         isRegistered = airlines[airline].isRegistered;
@@ -181,13 +181,13 @@ contract FlightSuretyData {
         numOfApproved = airlines[airline].approvedBy.length;
     }
 
-    // TODO: 获取允许某个airline注册的其他airline的列表。可以用来判断msg.sender是否已经同意了
+
     function getAirlineApprovalList(address airline) external returns(address[]) 
     {
         return airlines[airline].approvedBy;
     }
 
-    // TODO: 获取某个passenger保险的数额
+    
     function getPassengerInsuredAmount(address airline, string flight, uint256 timestamp, address passenger) external returns(uint256)
     {
         bytes32 key = getFlightKey(airline, flight, timestamp);
@@ -224,7 +224,7 @@ contract FlightSuretyData {
     }
 
 
-    // TODO: airline的approval列表里面添加新的airline
+    
     function addToAirlineApprovalList(address airline, address approver) external
     {
         airlines[airline].approvedBy.push(approver);
@@ -232,7 +232,7 @@ contract FlightSuretyData {
 
     function registerFlight (string flight, address airline, uint256 timestamp) external requireAirlineFunded(airline) 
     {
-        // TODO: 前面两个过程是否可以调换
+        
         // ****** 通过getFlightKey来获得key ****** 
         bytes32 flightKey = getFlightKey(airline, flight, timestamp);
         // ****** 判断是否已经注册了 ******
@@ -248,7 +248,7 @@ contract FlightSuretyData {
        });
        flight_list.push(flightKey);
     }
-    // TODO: 处理flight状态
+    
     function processFlightStatus(bytes32 flightKey, uint8 statusCode) external 
     {
         // ******* 使用flightKey提取处对应的flight *******
@@ -367,7 +367,7 @@ contract FlightSuretyData {
                             external 
                             payable 
     {
-        //TODO: 这个是什么函数来着
+        
         fund(tx.origin);
     }
 
