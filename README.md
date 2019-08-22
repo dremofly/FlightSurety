@@ -39,3 +39,8 @@ Truffle v5.0.18 (core: 5.0.18)
 Solidity - ^0.4.25 (solc-js)
 Node v10.15.1
 ```
+
+## Demo
+![](demo/1.png)
+![](demo/2.png)
+![](demo/3.png)
